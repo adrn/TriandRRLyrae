@@ -316,7 +316,7 @@ Cell[BoxData["201.53275629309735`"], "Output",
    3.6307178218280687`*^9, {3.630718008919957*^9, 3.6307180237587013`*^9}}]
 }, Open  ]]
 },
-WindowSize->{784, 970},
+WindowSize->{784, 851},
 WindowMargins->{{Automatic, 230}, {Automatic, 0}},
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (September 9, \
 2014)",
