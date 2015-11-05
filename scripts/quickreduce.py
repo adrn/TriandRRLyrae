@@ -95,7 +95,7 @@ def make_master_flat(images, master_bias, oscan_idx, plot=False):
 
     return master_flat_e
 
-def main(path, datafile, oscan_idx, ntracebins=32, median_filter_kernel=3, interactive=False):
+def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_filter_kernel=3, interactive=False):
     """ """
 
     # all FITS images
@@ -179,8 +179,18 @@ def main(path, datafile, oscan_idx, ntracebins=32, median_filter_kernel=3, inter
         right = int(round(p[1] + 3*p[2]))
         flux[i1:i2] = d[i1:i2,left:right].sum(axis=1)
 
+    if wavelengthfile is None:
+        x = dispersion_px
+
+    else:
+        wv = np.genfromtxt(wavelengthfile, names=True)
+        pl.clf()
+        pl.plot(wv['pixel'], wv['wavelength'], marker='o')
+        pl.show()
+        return
+
     fig,ax = pl.subplots(1,1)
-    ax.plot(flux, marker=None, drawstyle='steps')
+    ax.plot(x, flux, marker=None, drawstyle='steps')
     pl.show()
 
 if __name__ == "__main__":
@@ -198,6 +208,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--data", dest="datafile", required=True,
                         type=str, help="Data frame.")
+    parser.add_argument("--wvln", dest="wvlnfile", required=True,
+                        type=str, help="Wavelength pixel map file.")
     parser.add_argument("--path", dest="path", required=True,
                         type=str, help="Path to flats and bias files.")
     parser.add_argument("--oscan-idx", dest="overscan", required=True,
@@ -219,4 +231,5 @@ if __name__ == "__main__":
         logger.setLevel(logging.INFO)
 
     main(path=args.path, datafile=args.datafile, oscan_idx=args.overscan, ntracebins=args.ntracebins,
-         interactive=args.interactive, median_filter_kernel=args.ksize)
+         interactive=args.interactive, median_filter_kernel=args.ksize,
+         wavelengthfile=args.wvlnfile)
