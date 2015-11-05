@@ -20,6 +20,7 @@ import numpy as np
 import scipy.optimize as so
 from astropy.modeling import models
 from scipy.signal import medfilt2d
+import scipy.interpolate as si
 
 # suppress warning about correlated errors
 from astropy import nddata
@@ -184,10 +185,9 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
 
     else:
         wv = np.genfromtxt(wavelengthfile, names=True)
-        pl.clf()
-        pl.plot(wv['pixel'], wv['wavelength'], marker='o')
-        pl.show()
-        return
+        # pix2wvl = si.interp1d(wv['pixel'], wv['wavelength'], kind='cubic')
+        pix2wvl = si.InterpolatedUnivariateSpline(wv['pixel'], wv['wavelength'], k=3)
+        x = pix2wvl(dispersion_px)
 
     fig,ax = pl.subplots(1,1)
     ax.plot(x, flux, marker=None, drawstyle='steps')
