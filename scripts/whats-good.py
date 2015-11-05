@@ -53,6 +53,7 @@ def main(filename):
 
     ix = (phases > 0.05) & (phases < 0.8)
     good_targets = tbl[ix]
+    good_targets['phase'] = phases[ix]
 
     # add a column with estimated exposure times
     good_targets['exptime'] = [Vmag_to_exptime(V) for V in good_targets['VmagAvg']]
@@ -66,13 +67,10 @@ def main(filename):
     airmass = altaz.secz
     good_targets['airmass'] = airmass
 
-    # filter on airmass
-    good_targets = good_targets[good_targets['airmass'] < 1.5]
-
-    print('{0:<16} {1:<10} {2:<10} {3:<10}'.format("ID","V [mag]","airmass","exptime [sec]"))
-    print('-'*(16+10+10+10+6))
-    fmt_string = '{0:<16} {1:<10.2f} {2:<10.2f} {3:<10.0f}'
-    for row in good_targets[['ID2015','VmagAvg','airmass','exptime']]:
+    print('{0:<16} {1:<10} {2:<10} {3:<10} {4:<10}'.format("ID","V [mag]","airmass","phase","exptime [sec]"))
+    print('-'*(16+10+10+10+10+6))
+    fmt_string = '{0:<16} {1:<10.2f} {2:<10.2f} {3:<10.2f} {4:<10.0f}'
+    for row in good_targets[['ID2015','VmagAvg','airmass','phase','exptime']]:
         print(fmt_string.format(*row))
 
 if __name__ == "__main__":
