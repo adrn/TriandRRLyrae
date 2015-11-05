@@ -48,7 +48,8 @@ def main(filename):
 
         # HACK: this corrects for the fact that CSS defines phase = 0.5
         #   to be peak brightness...Brani uses phase = 0.
-        phases[i] = (phases[i] - 0.5) % 1.
+        # phases[i] = (phases[i] - 0.5) % 1.
+        # UPDATE: actually, I think CSS uses the peak...
 
     ix = (phases > 0.05) & (phases < 0.8)
     good_targets = tbl[ix]
@@ -72,7 +73,6 @@ def main(filename):
     print('-'*(16+10+10+10+6))
     fmt_string = '{0:<16} {1:<10.2f} {2:<10.2f} {3:<10.0f}'
     for row in good_targets[['ID2015','VmagAvg','airmass','exptime']]:
-        # print(row) #['ID2015','VmagAvg','airmass','exptime'])
         print(fmt_string.format(*row))
 
 if __name__ == "__main__":
