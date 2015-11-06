@@ -119,18 +119,23 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
     else:
         d = obj_img.data
 
-    if interactive:
-        tmp = defaultdict(lambda: None)
-        def on_key_press(event, fig):
-            if event.key == 'c':
-                tmp['dispersion_axis'] = 0
-                tmp['spectrum_idx'] = event.xdata
-                pl.close(fig)
+    # HACK:
+    dispersion_axis = 0
 
-            elif event.key == 'l' or event.key == 'r':
-                tmp['dispersion_axis'] = 1
-                tmp['spectrum_idx'] = event.ydata
-                pl.close(fig)
+    if interactive:
+        tmp = defaultdict(list)
+        def on_key_press(event, fig):
+            if event.key == 'enter': # left of peak
+                if tmp['indices'] is None:
+                    tmp['indices'] = []
+                tmp['indices'].append(event.xdata)
+
+                if tmp['_lines'] is None:
+                    tmp['_lines'] = []
+                tmp['_lines'].append(fig.axes[0].axvline(event.xdata, alpha=0.75, color='g'))
+
+                if len(tmp['_lines']) == 2: # user specified both left and righ
+                    pl.close(fig)
 
         # show image of the CCD, let user set approximate position of the spectrum
         #   to extract
@@ -141,18 +146,25 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
         fig.tight_layout()
         pl.show()
 
-        dispersion_axis = tmp['dispersion_axis']
-        spectrum_idx = tmp['spectrum_idx']
+        if len(tmp['indices']) == 0:
+            raise ValueError("Did you close the plot without selecting a "
+                             "column or columns to extract?")
 
-        if dispersion_axis is None:
-            raise ValueError("Did you close the plot without selecting a row "
-                             "or column to extract along?")
+        elif len(tmp['indices']) == 1: # center line
+            spectrum_idx = tmp['indices'][0]
+            row_slc = slice(None, None)
+
+        elif len(tmp['indices']) == 2: # left and right
+            spectrum_idx = np.mean(tmp['indices'])
+            row_slc = slice(int(np.min(tmp['indices'])), int(np.max(tmp['indices'])))
+
+        else:
+            assert True, "should never get here"
 
     else:
         _idx = np.linspace(0, d.shape[0]-1, min(32,d.shape[0])).astype(int)
-
-        dispersion_axis = np.argmax(d.shape)
         spectrum_idx = np.median(d[_idx].argmax(axis=-1))
+        row_slc = slice(None, None)
 
     # pixels down dispersion axis
     dispersion_px = np.arange(d.shape[0], dtype=float)
@@ -161,14 +173,19 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
     trace_bin_idx = np.linspace(0, d.shape[0], ntracebins).astype(int)
     flux = np.zeros_like(dispersion_px)
     for i1,i2 in zip(trace_bin_idx[:-1],trace_bin_idx[1:]):
-        row = np.median(d[i1:i2], axis=0)
+        row = np.median(d[i1:i2,row_slc], axis=0)
 
-        p0 = (row[int(round(spectrum_idx))],
-              spectrum_idx,
+        if row_slc.start is None:
+            i0 = 0
+        else:
+            i0 = row_slc.start
+
+        p0 = (row[int(round(spectrum_idx - i0))],
+              spectrum_idx - i0,
               2., # initial spread
               np.median(row))
         try:
-            p,_ = so.curve_fit(gaussian_constant, slit_px, row, p0=p0)
+            p,_ = so.curve_fit(gaussian_constant, slit_px[row_slc], row, p0=p0)
         except RuntimeError:
             logger.debug("Failed to fit Gaussian.")
             continue
@@ -176,8 +193,8 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
         if p[0] < 0.:
             continue
 
-        left = int(round(p[1] - 3*p[2]))
-        right = int(round(p[1] + 3*p[2]))
+        left = int(round(p[1] - 3*p[2])) + i0
+        right = int(round(p[1] + 3*p[2])) + i0
         flux[i1:i2] = d[i1:i2,left:right].sum(axis=1)
 
     if wavelengthfile is None:
