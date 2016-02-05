@@ -13,6 +13,7 @@ import os
 # Third-party
 import ccdproc
 from astropy import log as logger
+from astropy.io import fits
 import astropy.units as u
 import matplotlib.pyplot as pl
 from matplotlib.widgets import Cursor
@@ -105,8 +106,8 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
     master_flat = make_master_flat(images, master_bias, oscan_idx)
 
     # read the data frame
-    obj_img = ccdproc.CCDData.read(os.path.abspath(os.path.expanduser(datafile)),
-                                   unit=u.adu)
+    data_path = os.path.abspath(os.path.expanduser(datafile))
+    obj_img = ccdproc.CCDData.read(data_path, unit=u.adu)
     obj_img = [obj_img] # HACK
     oscan_and_trim(obj_img, oscan_idx) # HACK
     obj_img = obj_img[0] # HACK
@@ -208,6 +209,8 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
 
     fig,ax = pl.subplots(1,1)
     ax.plot(x, flux, marker=None, drawstyle='steps')
+    hdr = fits.getheader(data_path)
+    fig.suptitle("{0} ({1:.0f} s)".format(hdr['OBJECT'],hdr['EXPTIME']), fontsize=20)
     pl.show()
 
 if __name__ == "__main__":
