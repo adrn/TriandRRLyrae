@@ -108,6 +108,7 @@ def main(filename, donefile=None, ut_date=None, ut_time=None, mag_limit=None,
 
     good_targets.sort(sort)
 
+    print("Current local time: {}".format(datetime.datetime.now()))
     print('{0:<16} {1:<10} {2:<10} {3:<10} {4:<10}'.format("ID","VmagAvg","airmass","phase","exptime"))
     print('-'*(16+10+10+10+10+6))
     fmt_string = '{0:<16} {1:<10.2f} {2:<10.2f} {3:<10.2f} {4:<10.0f}'
