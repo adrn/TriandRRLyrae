@@ -228,9 +228,9 @@ if __name__ == "__main__":
                         default=False, help="Interactive mode!")
 
     parser.add_argument("--data", dest="datafile", required=True,
-                        type=str, help="Data frame.")
+                        type=str, help="Full path to a data frame.")
     parser.add_argument("--wvln", dest="wvlnfile", required=True,
-                        type=str, help="Wavelength pixel map file.")
+                        type=str, help="Full path to the wavelength-pixel map file.")
     parser.add_argument("--path", dest="path", required=True,
                         type=str, help="Path to flats and bias files.")
     parser.add_argument("--oscan-idx", dest="overscan", required=True,
