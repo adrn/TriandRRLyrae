@@ -120,7 +120,9 @@ if __name__ == "__main__":
                         default=False, help="Be quiet! (default = False)")
 
     parser.add_argument("-o","--output", dest="outputpath", required=True,
-                        type=str, help="Path to output file.")
+                        type=str,
+                        help="Path to output file, e.g., "
+                             "data/mdm-spring-2016/rough-wavelength.txt")
     parser.add_argument("--comppath", dest="path", required=True,
                         type=str, help="Path to comp spectrum file.")
     parser.add_argument("--oscan-idx", dest="overscan", required=True,

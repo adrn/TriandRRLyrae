@@ -204,6 +204,7 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
     else:
         wv = np.genfromtxt(wavelengthfile, names=True)
         # pix2wvl = si.interp1d(wv['pixel'], wv['wavelength'], kind='cubic')
+        wv = wv[wv['pixel'].argsort()]
         pix2wvl = si.InterpolatedUnivariateSpline(wv['pixel'], wv['wavelength'], k=3)
         x = pix2wvl(dispersion_px)
 
