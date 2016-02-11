@@ -1,4 +1,12 @@
-""" Print out a table of stars that would be good to observe now. """
+"""
+    Print out a table of stars that would be good to observe now.
+
+    Examples:
+
+    python whats-good.py -f ../spring2016/targets/GASSA13_2016.txt \
+    --donefile=../spring2016/donelist.txt -s airmass --maxphase=0.2
+
+"""
 
 from __future__ import division, print_function
 
@@ -19,11 +27,24 @@ from astropy.utils.exceptions import AstropyWarning
 import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
 
-from gary.observation.rrlyrae import time_to_phase
-
 kitt_peak = coord.EarthLocation.from_geodetic(lon=-111.5967*u.deg,
                                               lat=31.9583*u.deg,
                                               height=2000.*u.m)
+
+def time_to_phase(time, period, t0):
+    """
+    Convert an array astropy.time.Time to an array of phases.
+
+    Parameters
+    ----------
+    time : astropy.time.Time
+        The grid of times to extrapolate to.
+    period : astropy.units.Quantity
+        Period of the source.
+    t0 : astropy.time.Time
+        Peak time.
+    """
+    return ((time.jd-t0.jd) % period.to(u.day).value) / period.to(u.day).value
 
 def Vmag_to_exptime(V):
     # estimate exposure times

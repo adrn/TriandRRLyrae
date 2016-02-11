@@ -1,6 +1,11 @@
-# coding: utf-8
+"""
+    Quick reduce a 1D spectrum from Modspec at MDM.
 
-""" Quick reduce a 1D spectrum from Modspec at MDM. """
+    Examples:
+
+    python quickreduce.py --path=../spring2016/m020516/ --oscan-idx=300 \
+    --wvln=../spring2016/rough-wavelength.txt --data=../spring2016/m020516/m020516.021.fit
+"""
 
 from __future__ import division, print_function
 
@@ -101,7 +106,7 @@ def main(path, datafile, oscan_idx, wavelengthfile=None, ntracebins=32, median_f
     """ """
 
     # all FITS images
-    images = ccdproc.ImageFileCollection(path, keywords='*')
+    images = ccdproc.ImageFileCollection(os.path.abspath(path), keywords='*')
     master_bias = make_master_bias(images, oscan_idx)
     master_flat = make_master_flat(images, master_bias, oscan_idx)
 

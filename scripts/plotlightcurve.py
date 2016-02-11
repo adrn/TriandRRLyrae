@@ -1,4 +1,11 @@
-""" Plot the Catalina light curve for a given target name in a catalog file """
+"""
+    Plot the Catalina light curve for a given target name in a catalog file
+
+    Examples:
+
+    python scripts/plotlightcurve.py -f ../spring2016/targets/GASSA13_2016.txt -n GA-RR14
+
+"""
 
 from __future__ import division, print_function
 
