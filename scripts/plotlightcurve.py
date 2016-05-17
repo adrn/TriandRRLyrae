@@ -75,12 +75,19 @@ def main(filename, target_name):
     else:
         data = np.load(CSS_LC_file)
 
-    # match target coordinates to data
-    c = coord.ICRS(ra=data['ra']*u.degree, dec=data['dec']*u.degree)
-    sep = target_c.separation(c)
-    idx = (sep < 1*u.arcsecond)
+    for sep_radius in [10, 5, 2.5, 1]*u.arcsecond:
+        # match target coordinates to data
+        c = coord.ICRS(ra=data['ra']*u.degree, dec=data['dec']*u.degree)
+        sep = target_c.separation(c)
+        idx = (sep < sep_radius)
 
-    target_data = data[idx]
+        target_data = data[idx]
+        if len(np.unique(target_data['CSSID'])) == 1:
+            break
+
+    if len(np.unique(target_data['CSSID'])) > 1:
+        raise ValueError("More than one CSS target found for this target name!")
+
     fig,axes = plot_lc(target_data['MJD'], target_data['mag'], target_data['mag_err'],
                        period=css_row['period'], mjd0=css_row['mjd0'])
     pl.tight_layout()
